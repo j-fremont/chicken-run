@@ -4,6 +4,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import requests
 import json
+#import asyncio
 
 from dash.dependencies import Input, Output
 
@@ -30,8 +31,11 @@ app.layout = html.Div([
                 dbc.FormGroup([
                     dbc.ButtonGroup([
                         dbc.Button("Afficher la photo", color="primary", className="mr-1"),
-                        dbc.Button("Supprimer la photo", color="primary", className="mr-1")
+                        dbc.Button("Supprimer la photo", id="delete_picture", color="primary", className="mr-1")
                     ])
+                ]),
+                dbc.FormGroup([
+                    dbc.Label("", id="message_info"),
                 ]),
             ]),
         ], width=3),
@@ -51,27 +55,42 @@ app.layout = html.Div([
     }
 )
 
+#async def post_picture_list():
+#    response = await requests.post('http://192.168.1.62:5000/picture/list')
+#    files = json.loads(response.text)['files']
+#    return [{'label': file, 'value': file} for file in files]
+
 @app.callback(
-    Output("file_list", "options"),
-    [Input("dummy", "children"),]
+    Output("file_list", "options"), [Input("dummy", "children"),]
 )
 def on_init(n):
     response = requests.post('http://192.168.1.62:5000/picture/list')
     files = json.loads(response.text)['files']
+    print(files)
     return [{'label': file, 'value': file} for file in files]
+    #return asyncio.run(poste_picture_list())
 
 @app.callback(
-    Output("file_list", "options"), [Input("take_picture", "n_clicks"),]
-#    Output("card_image", "src"), [Input("take_picture", "n_clicks"),]
+    Output("card_image", "src"), [Input("take_picture", "n_clicks"),]
 )
 def on_take_picture(n):
+    requests.get('http://192.168.1.62:5000/picture/new')
     return app.get_asset_url('image.jpg')
+
+@app.callback(
+    Output("message_info", "children"), [Input("delete_picture", "n_clicks"), Input('file_list', 'value')]
+)
+def on_delete_picture(n, file):
+    print(file);
+    requests.post('http://192.168.1.62:5000/picture/remove/' + file)
+    return 'Ok'
 
 #@app.callback(
 #    [Input(component_id='file_list', component_property='value'),]
 #)
 #def update_file(file):
 #    print file
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

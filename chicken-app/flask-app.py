@@ -26,7 +26,7 @@ def picture_list():
     return jsonify({'files':files})
 
 @app.route("/picture/remove/<file>", methods = ['POST'])
-def picture_remove():
+def picture_remove(file):
     remove('/home/pi/pictures/' + file)
     return jsonify({'result':'success'})
 
