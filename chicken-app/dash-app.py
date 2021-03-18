@@ -2,6 +2,8 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import requests
+import json
 
 from dash.dependencies import Input, Output
 
@@ -23,6 +25,7 @@ app.layout = html.Div([
                             {"label": "Option 2", "value": 2},
                         ],
                     ),
+                    html.Div(id='dummy')
                 ]),
                 dbc.FormGroup([
                     dbc.ButtonGroup([
@@ -33,16 +36,12 @@ app.layout = html.Div([
             ]),
         ], width=3),
         dbc.Col([
-dbc.Card(
-    [
-        dbc.CardImg(id="card_image", top=True),
-        dbc.CardBody(
-            html.P("This card has an image at the top", id="card_label", className="card-text")
-        ),
-    ],
-    style={"width": "18rem"},
-)
-
+            dbc.Card([
+                dbc.CardImg(id="card_image", top=True),
+                dbc.CardBody(
+                    html.P("This card has an image at the top", id="card_label", className="card-text")
+                ),
+            ], style={"width": "18rem"})
         ], width=9),
     ])
 ], style = {
@@ -53,7 +52,17 @@ dbc.Card(
 )
 
 @app.callback(
-    Output("card_image", "src"), [Input("take_picture", "n_clicks"),]
+    Output("file_list", "options"),
+    [Input("dummy", "children"),]
+)
+def on_init(n):
+    response = requests.post('http://192.168.1.62:5000/picture/list')
+    files = json.loads(response.text)['files']
+    return [{'label': file, 'value': file} for file in files]
+
+@app.callback(
+    Output("file_list", "options"), [Input("take_picture", "n_clicks"),]
+#    Output("card_image", "src"), [Input("take_picture", "n_clicks"),]
 )
 def on_take_picture(n):
     return app.get_asset_url('image.jpg')
