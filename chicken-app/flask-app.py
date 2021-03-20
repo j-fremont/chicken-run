@@ -17,7 +17,7 @@ def picture_new():
     return send_file('/home/pi/pictures/image_' + dt_string + '.jpg', mimetype='image/jpeg')
 
 @app.route("/picture/get/<file>", methods = ['GET'])
-def picture_get():
+def picture_get(file):
     return send_file('/home/pi/pictures/' + file, mimetype='image/jpeg')
 
 @app.route("/picture/list", methods = ['POST'])

@@ -6,7 +6,7 @@ import requests
 import json
 #import asyncio
 
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SOLAR])
 
@@ -30,7 +30,7 @@ app.layout = html.Div([
                 ]),
                 dbc.FormGroup([
                     dbc.ButtonGroup([
-                        dbc.Button("Afficher la photo", color="primary", className="mr-1"),
+                        dbc.Button("Afficher la photo", id="get_picture", color="primary", className="mr-1"),
                         dbc.Button("Supprimer la photo", id="delete_picture", color="primary", className="mr-1")
                     ])
                 ]),
@@ -74,17 +74,28 @@ def on_init(n):
     Output("card_image", "src"), [Input("take_picture", "n_clicks"),]
 )
 def on_take_picture(n):
-    requests.get('http://192.168.1.62:5000/picture/new')
+    #requests.get('http://192.168.1.62:5000/picture/new')
     return app.get_asset_url('image.jpg')
 
+#@app.callback(
+#    Output("message_info", "children"), [Input("delete_picture", "n_clicks"), Input('file_list', 'value')]
+#)
+#def on_delete_picture(n, file):
+#    print(file);
+#    requests.post('http://192.168.1.62:5000/picture/remove/' + file)
+#    return 'Ok'
+
 @app.callback(
-    Output("message_info", "children"), [Input("delete_picture", "n_clicks"), Input('file_list', 'value')]
+    Output("message_info", "children"),
+    Input("get_picture", "n_clicks"),
+    State('file_list', 'value')
 )
 def on_delete_picture(n, file):
     print(file);
-    requests.post('http://192.168.1.62:5000/picture/remove/' + file)
+    requests.post('http://192.168.1.62:5000/picture/get/' + file)
     return 'Ok'
 
+#@app.callback(
 #@app.callback(
 #    [Input(component_id='file_list', component_property='value'),]
 #)
