@@ -61,12 +61,14 @@ app.layout = html.Div([
 #    return [{'label': file, 'value': file} for file in files]
 
 @app.callback(
-    Output("file_list", "options"), [Input("dummy", "children"),]
+    Output("file_list", "options"),
+    Input("dummy", "children")
 )
 def on_init(n):
     response = requests.post('http://192.168.1.62:5000/picture/list')
     files = json.loads(response.text)['files']
-    print(files)
+    files.sort()
+    #print(files)
     return [{'label': file, 'value': file} for file in files]
     #return asyncio.run(poste_picture_list())
 
@@ -86,13 +88,15 @@ def on_take_picture(n):
 #    return 'Ok'
 
 @app.callback(
+    #Output("file_list", "options"),
     Output("message_info", "children"),
     Input("get_picture", "n_clicks"),
     State('file_list', 'value')
 )
-def on_delete_picture(n, file):
+def on_get_picture(n, file):
     print(file);
-    requests.post('http://192.168.1.62:5000/picture/get/' + file)
+    r = requests.get('http://192.168.1.62:5000/picture/get/' + file, allow_redirects=True)
+    open('assets/' + file, 'wb').write(r.content)
     return 'Ok'
 
 #@app.callback(
