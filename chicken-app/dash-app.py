@@ -34,9 +34,7 @@ app.layout = html.Div([
                         dbc.Button("Supprimer la photo", id="delete_picture", color="primary", className="mr-1")
                     ])
                 ]),
-                dbc.FormGroup([
-                    dbc.Label("", id="message_info"),
-                ]),
+                dbc.Alert("", id="alert", dismissable=True, is_open=False),
             ]),
         ], width=3),
         dbc.Col([
@@ -69,7 +67,7 @@ def on_init(n):
     files = json.loads(response.text)['files']
     files.sort()
     #print(files)
-    return [{'label': file, 'value': file} for file in files]
+    return [{'label': file, 'value': file} for file in files], False
     #return asyncio.run(poste_picture_list())
 
 @app.callback(
@@ -79,33 +77,38 @@ def on_take_picture(n):
     #requests.get('http://192.168.1.62:5000/picture/new')
     return app.get_asset_url('image.jpg')
 
-#@app.callback(
-#    Output("message_info", "children"), [Input("delete_picture", "n_clicks"), Input('file_list', 'value')]
-#)
-#def on_delete_picture(n, file):
-#    print(file);
-#    requests.post('http://192.168.1.62:5000/picture/remove/' + file)
-#    return 'Ok'
-
 @app.callback(
-    #Output("file_list", "options"),
-    Output("message_info", "children"),
+    Output("alert", "is_open"),
+    Output("alert", "color"),
+    Output("alert", "children"),
+    Input("take_picture", "n_clicks"),
     Input("get_picture", "n_clicks"),
+    Input("delete_picture", "n_clicks"),
     State('file_list', 'value')
 )
-def on_get_picture(n, file):
-    print(file);
-    r = requests.get('http://192.168.1.62:5000/picture/get/' + file, allow_redirects=True)
-    open('assets/' + file, 'wb').write(r.content)
-    return 'Ok'
+def on_get_picture(take, get, delete, file):
 
-#@app.callback(
-#@app.callback(
-#    [Input(component_id='file_list', component_property='value'),]
-#)
-#def update_file(file):
-#    print file
+    ctx = dash.callback_context
 
+    if ctx.triggered:
+        input_id = ctx.triggered[0]["prop_id"].split('.')[0]
+
+        if input_id == 'take_picture':
+            return True, 'primary', 'Ok'
+
+        if input_id == 'get_picture':
+            r = requests.get('http://192.168.1.62:5000/picture/get/' + file, allow_redirects=True)
+            open('assets/' + file, 'wb').write(r.content)
+            return True, 'primary', 'Ok'
+
+        if input_id == 'delete_picture':
+            requests.post('http://192.168.1.62:5000/picture/remove/' + file)
+            return True, 'primary', 'Ok'
+
+#        if input_id == 'dummy':
+#            return False, 'primary', ''
+        
+    return True, 'primary', 'Ok'
 
 if __name__ == '__main__':
     app.run_server(debug=True)
