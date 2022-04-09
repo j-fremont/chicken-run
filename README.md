@@ -8,7 +8,7 @@ light-and-picture.py allume un jeu de LEDs blanches pendant 5 secondes et prend 
 $ python light-and-picture.py 50
 ```
 
-record.pŷ filme pendant le nombre de secondes passé en paramètres.i
+record.py filme pendant le nombre de secondes passé en paramètres.i
 
 ```
 $ python record.py 5
