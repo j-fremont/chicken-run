@@ -1,6 +1,6 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 import dash_bootstrap_components as dbc
 import requests
 import json
@@ -111,5 +111,5 @@ def on_get_picture(take, get, delete, file):
     return True, 'primary', 'Ok'
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host='0.0.0.0', port='8051', debug=True)
     
