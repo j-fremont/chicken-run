@@ -1,115 +1,91 @@
+# -*- coding: utf-8 -*-
+
 import dash
-from dash import dcc
-from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 import dash_bootstrap_components as dbc
 import requests
 import json
-#import asyncio
 
 from dash.dependencies import Input, Output, State
 
+proxies = {
+	"http": None,
+	"https": None
+}
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SOLAR])
 
+app.title = 'Chicken run'
+app._favicon = "favicon.ico"
+
 app.layout = html.Div([
-    dbc.Row([
-        dbc.Col([
-            dbc.Form([
-                dbc.FormGroup([
-                    dbc.Button("Prendre une nouvelle photo", id="take_picture", color="primary", className="mr-1"),
-                ]),
-                dbc.FormGroup([
-                    dbc.Label("Liste des photos", html_for="dropdown"),
-                    dcc.Dropdown(
-                        id="file_list",
-                        options=[
-                            {"label": "Option 1", "value": 1},
-                            {"label": "Option 2", "value": 2},
-                        ],
-                    ),
-                    html.Div(id='dummy')
-                ]),
-                dbc.FormGroup([
-                    dbc.ButtonGroup([
-                        dbc.Button("Afficher la photo", id="get_picture", color="primary", className="mr-1"),
-                        dbc.Button("Supprimer la photo", id="delete_picture", color="primary", className="mr-1")
-                    ])
-                ]),
-                dbc.Alert("", id="alert", dismissable=True, is_open=False),
-            ]),
-        ], width=3),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardImg(id="card_image", top=True),
-                dbc.CardBody(
-                    html.P("This card has an image at the top", id="card_label", className="card-text")
-                ),
-            ], style={"width": "18rem"})
-        ], width=9),
-    ])
+	dbc.Row([
+		dbc.Col([
+			dbc.Form([
+				dbc.FormGroup([
+					dbc.Label("Liste des photos", html_for="dropdown"),
+					dcc.Dropdown(id="file_list", persistence=True),
+					html.Div(id='dummy_list')
+				]),
+				dbc.Alert("", id="alert", dismissable=True, is_open=False),
+			]),
+		], width=3),
+		dbc.Col([
+			dbc.Card([
+				dbc.CardImg(id="card_image", top=True),
+				dbc.CardBody(id="card_body"
+
+				),
+				html.Div(id='dummy_image')
+			], style={"width": "45rem"})
+		], width=9),
+	])
 ], style = {
-    "position": "relative",
-    "top": "25px",
-    "left": "25px"
-    }
+	"position": "relative",
+	"top": "25px",
+	"left": "25px"
+	}
 )
-
-#async def post_picture_list():
-#    response = await requests.post('http://192.168.1.62:5000/picture/list')
-#    files = json.loads(response.text)['files']
-#    return [{'label': file, 'value': file} for file in files]
 
 @app.callback(
-    Output("file_list", "options"),
-    Input("dummy", "children")
+	Output("card_image", "src"),
+	[Input("dummy_image", "children"),
+	Input("file_list", "value")]
 )
-def on_init(n):
-    response = requests.post('http://192.168.1.62:5000/picture/list')
-    files = json.loads(response.text)['files']
-    files.sort()
-    #print(files)
-    return [{'label': file, 'value': file} for file in files], False
-    #return asyncio.run(poste_picture_list())
+def on_init_image(dummy_image, file_list):
+	if file_list == None:
+		name = 'last.jpg'
+	else:
+		name = file_list
+	response = requests.get('http://localhost:5000/image/get/' + name, proxies=proxies)
+	if response.status_code == 200:
+		with open('assets/image.jpg', 'wb') as f:
+			f.write(response.content)
+	return app.get_asset_url('image.jpg')
 
 @app.callback(
-    Output("card_image", "src"), [Input("take_picture", "n_clicks"),]
+	Output("file_list", "options"),
+	[Input("dummy_list", "children")]
 )
-def on_take_picture(n):
-    #requests.get('http://192.168.1.62:5000/picture/new')
-    return app.get_asset_url('image.jpg')
+def on_init_list(dummy_list):
+	list = []
+	response = requests.get('http://localhost:5000/image/list', proxies=proxies)
+	data = json.loads(response.content)
+	for item in data['files']:
+		if item != 'last.jpg':
+			list.append({
+				'label': item,
+				'value': item
+			})
+	return sorted(list, key=lambda d: d['value'])
 
 @app.callback(
-    Output("alert", "is_open"),
-    Output("alert", "color"),
-    Output("alert", "children"),
-    Input("take_picture", "n_clicks"),
-    Input("get_picture", "n_clicks"),
-    Input("delete_picture", "n_clicks"),
-    State('file_list', 'value')
+	Output("card_body", "children"),
+	[Input("file_list", "value")]
 )
-def on_get_picture(take, get, delete, file):
-
-    ctx = dash.callback_context
-
-    if ctx.triggered:
-        input_id = ctx.triggered[0]["prop_id"].split('.')[0]
-
-        if input_id == 'take_picture':
-            return True, 'primary', 'Ok'
-
-        if input_id == 'get_picture':
-            r = requests.get('http://192.168.1.62:5000/picture/get/' + file, allow_redirects=True)
-            open('assets/' + file, 'wb').write(r.content)
-            return True, 'primary', 'Ok'
-
-        if input_id == 'delete_picture':
-            requests.post('http://192.168.1.62:5000/picture/remove/' + file)
-            return True, 'primary', 'Ok'
-
-#        if input_id == 'dummy':
-#            return False, 'primary', ''
-        
-    return True, 'primary', 'Ok'
+def on_init_image(file_list):
+	return html.P(file_list, className="card-text")
 
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', port='8051', debug=True)
-    
+	app.run_server(debug=True)

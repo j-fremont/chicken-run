@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import RPi.GPIO as GPIO
 import sys
 
 from time import sleep
 from picamera import PiCamera
+from datetime import datetime
 
 dc=int(sys.argv[1]);
 
@@ -20,9 +23,9 @@ led.ChangeDutyCycle(dc);
 
 camera.start_preview()
 sleep(5)
-camera.capture('/home/pi/image.jpg')
+name = datetime.now().strftime("%Y-%m-%d_%H-%M_") + 'image.jpg'
+camera.capture('/home/pi/chicken-run/chicken-server/images/' + name)
 camera.stop_preview()
 sleep(2)
 
 led.ChangeDutyCycle(0);
-
