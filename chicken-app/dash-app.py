@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
 import dash_bootstrap_components as dbc
 import requests
 import json
 
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output, State
 
 proxies = {
@@ -88,4 +88,4 @@ def on_init_image(file_list):
 	return html.P(file_list, className="card-text")
 
 if __name__ == '__main__':
-	app.run_server(debug=True)
+	app.run_server(host='0.0.0.0', port=8050, debug=True)
