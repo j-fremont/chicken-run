@@ -26,6 +26,7 @@ sleep(5)
 name = datetime.now().strftime("%Y-%m-%d_%H-%M_") + 'image.jpg'
 camera.capture('/home/pi/chicken-run/chicken-server/images/' + name)
 camera.stop_preview()
+camera.close()
 sleep(2)
 
 led.ChangeDutyCycle(0);

@@ -1,3 +1,6 @@
 *.pyc
 *.swp
-./assets/*.jpg
+*.log
+*.out
+assets
+images
