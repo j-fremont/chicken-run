@@ -1,6 +1,6 @@
 # chicken-run
 
-Permet d'éclairer et de filmer l'intérieur d'une cabana oiseau.
+Permet d'éclairer et de filmer l'intérieur d'une cabane à oiseau.
 
 Lancer.
 
@@ -22,7 +22,7 @@ Pour streamer avec VLC. Côté Raspberry.
 libcamera-vid -t0 --width 1920 --height 1080 --framerate 10 --nopreview --codec h264 --profile high --intra 5 --listen -o tcp://0.0.0.0:8494
 ```
 
-Cếté VLC.
+Côté VLC.
 
 
 ```
