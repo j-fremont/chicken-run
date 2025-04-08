@@ -16,17 +16,17 @@ sudo apt install -y python3-picamera2
 sudo apt install -y ffmpeg
 ```
 
-Pour streamer avec VLC. Co�té Raspberry.
+Pour streamer avec VLC. Côté Raspberry.
 
 ```
 libcamera-vid -t0 --width 1920 --height 1080 --framerate 10 --nopreview --codec h264 --profile high --intra 5 --listen -o tcp://0.0.0.0:8494
 ```
 
-Côté VLC.
+Cếté VLC.
 
 
 ```
 vlc tcp/h264://192.168.1.46:8494
 ```
 
-Ne plus utiliser la page Webcam dans le wiki, correspond a l'ancienne lib cam�ra.
+Ne plus utiliser la page Webcam dans le wiki, correspond à l'ancienne lib caméra.
