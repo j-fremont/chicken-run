@@ -1,13 +1,5 @@
 #!/bin/bash
 
-#
-# Script de capture et d'éclairage dans la cabane à mésanges.
-#
-# light.py [DutyCycle] [Sleep]
-#   DutyCycle : intensité de l'éclairage de 0 à 100.
-#   Sleep : temps d'éclairage.
-#
-
 echo "+------------------------------------------------+"
 echo "| Capture et éclairage dans la cabane à mésanges |"
 echo "+------------------------------------------------+"
@@ -17,10 +9,13 @@ read -p "Eclairage (o/n): " light
 
 if [[ $light == [o] ]]; then
 
-	read -p "Duty cycle: " dc
-	read -p "Sleep: " sleep
+	read -p "Duty cycle(100): " dc
+	if [[ -z $dc ]]; then dc=100; fi
 
-	python3 light.py $dc $sleep
+	read -p "Sleep(30): " sleep
+	if [[ -z $sleep ]]; then sleep=30; fi
+
+	python3 light.py $dc $sleep &
 
 fi
 
@@ -32,7 +27,8 @@ if [[ $capture == [i] ]]; then
 
 elif [[ $capture == [f] ]]; then
 
-	read -p "Sleep: " duration
+	read -p "Sleep(30): " duration
+	if [[ -z $duration ]]; then duration=30; fi
 
 	python3 record.py $duration
 

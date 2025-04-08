@@ -1,12 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import sys
 
-from time import sleep
-from picamera import PiCamera
+from picamera2 import Picamera2
+from datetime import datetime
 
-camera = PiCamera();
-
-camera.start_preview()
-camera.start_recording('../chicken-server/movies/')
-sleep(float(sys.argv[1]))
-camera.stop_recording()
-camera.stop_preview()
+camera = Picamera2();
+name = datetime.now().strftime("%Y-%m-%d_%H-%M_") + 'movie.mp4'
+camera.start_and_record_video('../chicken-server/movies/' + name, duration=int(sys.argv[1]))
