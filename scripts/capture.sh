@@ -5,9 +5,9 @@ echo "| Capture et éclairage dans la cabane à mésanges |"
 echo "+------------------------------------------------+"
 echo ""
 
-read -p "Eclairage (o/n): " light
+read -p "Eclairage (O/n): " light
 
-if [[ $light == [o] ]]; then
+if [[ $light == [oO] || -z $light ]]; then
 
 	read -p "Duty cycle(100): " dc
 	if [[ -z $dc ]]; then dc=100; fi
@@ -16,10 +16,9 @@ if [[ $light == [o] ]]; then
 	if [[ -z $sleep ]]; then sleep=30; fi
 
 	python3 light.py $dc $sleep &
-
 fi
 
-read -p "Capture [image]/[film] (i/f/n): " capture
+read -p "Capture [image]/[film] (i/f/N): " capture
 
 if [[ $capture == [i] ]]; then
 
@@ -31,5 +30,4 @@ elif [[ $capture == [f] ]]; then
 	if [[ -z $duration ]]; then duration=30; fi
 
 	python3 record.py $duration
-
 fi
