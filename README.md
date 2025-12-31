@@ -30,3 +30,16 @@ vlc tcp/h264://192.168.1.46:8494
 ```
 
 Ne plus utiliser la page Webcam dans le wiki, correspond à l'ancienne lib caméra.
+
+Pour tester la caméra.
+
+```
+libcamera-hello
+```
+
+Si la caméra n'est pas reconnue, changer /boot/config.txt et rebooter.
+
+```
+camera_auto_detect=0
+```
+
